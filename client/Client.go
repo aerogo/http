@@ -75,3 +75,16 @@ func (http *Client) End() (Response, error) {
 	err := http.client.Do(http.request, http.response)
 	return http.Response(), err
 }
+
+// EndStruct executes the request, unmarshals the response body into a struct and returns the response.
+func (http *Client) EndStruct(obj interface{}) (Response, error) {
+	err := http.client.Do(http.request, http.response)
+	response := http.Response()
+
+	if err != nil {
+		return response, err
+	}
+
+	err = response.Unmarshal(obj)
+	return response, err
+}
