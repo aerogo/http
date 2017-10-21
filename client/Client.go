@@ -53,8 +53,20 @@ func (http *Client) Body(raw string) *Client {
 	return http
 }
 
-// Send executes the request and returns the response body.
-func (http *Client) Send() (string, error) {
+// BodyBytes sets the request body as a byte slice.
+func (http *Client) BodyBytes(raw []byte) *Client {
+	http.request.SetBody(raw)
+	return http
+}
+
+// End executes the request and returns the response body.
+func (http *Client) End() (string, error) {
 	err := http.client.Do(http.request, http.response)
 	return string(http.response.Body()), err
+}
+
+// EndBytes executes the request and returns the response body as a byte slice.
+func (http *Client) EndBytes() ([]byte, error) {
+	err := http.client.Do(http.request, http.response)
+	return http.response.Body(), err
 }
