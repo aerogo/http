@@ -1,6 +1,10 @@
 package client
 
-import "github.com/valyala/fasthttp"
+import (
+	"strings"
+
+	"github.com/valyala/fasthttp"
+)
 
 // Headers is a synonym for map[string]string.
 type Headers map[string]string
@@ -13,22 +17,22 @@ type Client struct {
 }
 
 // Get builds a GET request.
-func Get(url string) *Client {
+func Get(path string) *Client {
 	http := new(Client)
 	http.request = fasthttp.AcquireRequest()
 	http.response = fasthttp.AcquireResponse()
 
-	http.request.SetRequestURI(url)
+	http.request.SetRequestURI(strings.Replace(path, " ", "%20", -1))
 	return http
 }
 
 // Post builds a POST request.
-func Post(url string) *Client {
+func Post(path string) *Client {
 	http := new(Client)
 	http.request = fasthttp.AcquireRequest()
 	http.response = fasthttp.AcquireResponse()
 
-	http.request.SetRequestURI(url)
+	http.request.SetRequestURI(strings.Replace(path, " ", "%20", -1))
 	http.request.Header.SetMethod("POST")
 	return http
 }

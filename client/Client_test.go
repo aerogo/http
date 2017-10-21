@@ -3,16 +3,15 @@ package client_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/aerogo/http/client"
 	"github.com/parnurzeal/gorequest"
+	"github.com/stretchr/testify/assert"
 )
 
-const url = "https://blitzprog.org"
+const path = "https://blitzprog.org/"
 
 func TestClient(t *testing.T) {
-	resp, err := client.Get(url).End()
+	resp, err := client.Get(path).End()
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode())
@@ -23,7 +22,7 @@ func BenchmarkClient(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		client.Get(url).End()
+		client.Get(path).End()
 	}
 }
 
@@ -31,7 +30,7 @@ func BenchmarkClientWithBody(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		resp, _ := client.Get(url).End()
+		resp, _ := client.Get(path).End()
 		resp.Body()
 	}
 }
@@ -40,6 +39,6 @@ func BenchmarkGoRequest(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		gorequest.New().Get(url).End()
+		gorequest.New().Get(path).End()
 	}
 }
