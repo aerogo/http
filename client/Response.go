@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 
 	"github.com/valyala/fasthttp"
 )
@@ -48,4 +49,9 @@ func (response Response) BodyBytes() []byte {
 // RawBodyBytes returns the raw response body as a byte slice.
 func (response Response) RawBodyBytes() []byte {
 	return response.inner.Body()
+}
+
+// Unmarshal tries to JSON decode the response and save it in the object.
+func (response Response) Unmarshal(obj interface{}) error {
+	return json.Unmarshal(response.BodyBytes(), obj)
 }
