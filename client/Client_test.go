@@ -3,11 +3,21 @@ package client_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/aerogo/http/client"
 	"github.com/parnurzeal/gorequest"
 )
 
-const url = "https://google.com"
+const url = "https://blitzprog.org"
+
+func TestClient(t *testing.T) {
+	resp, err := client.Get(url).End()
+
+	assert.NoError(t, err)
+	assert.Equal(t, 200, resp.StatusCode())
+	assert.NotEmpty(t, resp.Body())
+}
 
 func BenchmarkClient(b *testing.B) {
 	b.ReportAllocs()
