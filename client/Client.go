@@ -59,14 +59,15 @@ func (http *Client) BodyBytes(raw []byte) *Client {
 	return http
 }
 
-// End executes the request and returns the response body.
-func (http *Client) End() (string, error) {
-	err := http.client.Do(http.request, http.response)
-	return string(http.response.Body()), err
+// Response returns the response object.
+func (http *Client) Response() Response {
+	return Response{
+		inner: http.response,
+	}
 }
 
-// EndBytes executes the request and returns the response body as a byte slice.
-func (http *Client) EndBytes() ([]byte, error) {
+// End executes the request and returns the response.
+func (http *Client) End() (Response, error) {
 	err := http.client.Do(http.request, http.response)
-	return http.response.Body(), err
+	return http.Response(), err
 }
