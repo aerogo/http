@@ -15,7 +15,7 @@ func TestClient(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, 200, resp.StatusCode())
-	assert.NotEmpty(t, resp.Body())
+	assert.NotEmpty(t, resp.String())
 }
 
 func BenchmarkClient(b *testing.B) {
@@ -31,7 +31,7 @@ func BenchmarkClientWithBody(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		resp, _ := client.Get(path).End()
-		resp.Body()
+		resp.String()
 	}
 }
 

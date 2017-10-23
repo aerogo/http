@@ -19,18 +19,18 @@ func (response Response) StatusCode() int {
 	return response.inner.StatusCode()
 }
 
-// Body returns the response body as a string.
-func (response Response) Body() string {
-	return string(response.BodyBytes())
+// String returns the response body as a string.
+func (response Response) String() string {
+	return string(response.Bytes())
 }
 
-// RawBody returns the raw response body as a string.
-func (response Response) RawBody() string {
-	return string(response.RawBodyBytes())
+// RawString returns the raw response body as a string.
+func (response Response) RawString() string {
+	return string(response.RawBytes())
 }
 
-// BodyBytes returns the response body as a byte slice and unzips gzipped content when necessary.
-func (response Response) BodyBytes() []byte {
+// Bytes returns the response body as a byte slice and unzips gzipped content when necessary.
+func (response Response) Bytes() []byte {
 	encoding := response.inner.Header.Peek("Content-Encoding")
 
 	if bytes.Equal(encoding, gzipType) {
@@ -46,12 +46,12 @@ func (response Response) BodyBytes() []byte {
 	return response.inner.Body()
 }
 
-// RawBodyBytes returns the raw response body as a byte slice.
-func (response Response) RawBodyBytes() []byte {
+// RawBytes returns the raw response body as a byte slice.
+func (response Response) RawBytes() []byte {
 	return response.inner.Body()
 }
 
 // Unmarshal tries to JSON decode the response and save it in the object.
 func (response Response) Unmarshal(obj interface{}) error {
-	return json.Unmarshal(response.BodyBytes(), obj)
+	return json.Unmarshal(response.Bytes(), obj)
 }
