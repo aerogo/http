@@ -48,8 +48,20 @@ response.String()
 response.Bytes()
 ```
 
-### Parse response body as JSON
+### Deserialize response body into an object (JSON)
 
 ```go
 response.Unmarshal(&obj)
+```
+
+### Response body as a string without unzipping gzip contents
+
+```go
+response.RawString()
+```
+
+### Response body as bytes without unzipping gzip contents
+
+```go
+response.RawBytes()
 ```
