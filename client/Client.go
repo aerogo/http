@@ -23,6 +23,7 @@ func Get(path string) *Client {
 	http.response = fasthttp.AcquireResponse()
 
 	http.request.SetRequestURI(strings.Replace(path, " ", "%20", -1))
+	http.request.Header.Set("Accept-Encoding", "gzip")
 	return http
 }
 
