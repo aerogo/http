@@ -1,6 +1,8 @@
 package client
 
 import (
+	"encoding/json"
+	"log"
 	"strings"
 
 	"github.com/valyala/fasthttp"
@@ -55,6 +57,19 @@ func (http *Client) Headers(headers Headers) *Client {
 // Body sets the request body.
 func (http *Client) Body(raw string) *Client {
 	http.request.SetBodyString(raw)
+	return http
+}
+
+// BodyJSON sets the request body by converting the object to JSON.
+func (http *Client) BodyJSON(obj interface{}) *Client {
+	data, err := json.Marshal(obj)
+
+	if err != nil {
+		log.Printf("Error converting request body to JSON: %v", err)
+		return http
+	}
+
+	http.request.SetBody(data)
 	return http
 }
 
