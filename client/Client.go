@@ -20,9 +20,10 @@ type Client struct {
 
 // Get builds a GET request.
 func Get(path string) *Client {
-	http := new(Client)
-	http.request = fasthttp.AcquireRequest()
-	http.response = fasthttp.AcquireResponse()
+	http := &Client{
+		request:  fasthttp.AcquireRequest(),
+		response: fasthttp.AcquireResponse(),
+	}
 
 	http.request.SetRequestURI(strings.Replace(path, " ", "%20", -1))
 	http.request.Header.Set("Accept-Encoding", "gzip")
@@ -31,12 +32,14 @@ func Get(path string) *Client {
 
 // Post builds a POST request.
 func Post(path string) *Client {
-	http := new(Client)
-	http.request = fasthttp.AcquireRequest()
-	http.response = fasthttp.AcquireResponse()
+	http := &Client{
+		request:  fasthttp.AcquireRequest(),
+		response: fasthttp.AcquireResponse(),
+	}
 
 	http.request.SetRequestURI(strings.Replace(path, " ", "%20", -1))
 	http.request.Header.SetMethod("POST")
+	http.request.Header.Set("Accept-Encoding", "gzip")
 	return http
 }
 
@@ -51,6 +54,7 @@ func (http *Client) Headers(headers Headers) *Client {
 	for key, value := range headers {
 		http.request.Header.Set(key, value)
 	}
+
 	return http
 }
 

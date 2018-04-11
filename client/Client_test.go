@@ -4,11 +4,10 @@ import (
 	"testing"
 
 	"github.com/aerogo/http/client"
-	"github.com/parnurzeal/gorequest"
 	"github.com/stretchr/testify/assert"
 )
 
-const path = "https://blitzprog.org/"
+const path = "https://github.com"
 
 func TestClient(t *testing.T) {
 	resp, err := client.Get(path).End()
@@ -31,14 +30,9 @@ func BenchmarkClientWithBody(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		resp, _ := client.Get(path).End()
-		resp.String()
-	}
-}
 
-func BenchmarkGoRequest(b *testing.B) {
-	b.ReportAllocs()
-
-	for i := 0; i < b.N; i++ {
-		gorequest.New().Get(path).End()
+		if resp.String() == "" {
+			b.Error("Empty response")
+		}
 	}
 }
