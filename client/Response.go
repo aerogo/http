@@ -2,8 +2,8 @@ package client
 
 import (
 	"bytes"
-	"encoding/json"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 )
 
@@ -53,5 +53,5 @@ func (response Response) RawBytes() []byte {
 
 // Unmarshal tries to JSON decode the response and save it in the object.
 func (response Response) Unmarshal(obj interface{}) error {
-	return json.Unmarshal(response.Bytes(), obj)
+	return jsoniter.Unmarshal(response.Bytes(), obj)
 }

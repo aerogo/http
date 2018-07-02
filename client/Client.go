@@ -1,10 +1,10 @@
 package client
 
 import (
-	"encoding/json"
 	"log"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/valyala/fasthttp"
 )
 
@@ -66,7 +66,7 @@ func (http *Client) Body(raw string) *Client {
 
 // BodyJSON sets the request body by converting the object to JSON.
 func (http *Client) BodyJSON(obj interface{}) *Client {
-	data, err := json.Marshal(obj)
+	data, err := jsoniter.Marshal(obj)
 
 	if err != nil {
 		log.Printf("Error converting request body to JSON: %v", err)
