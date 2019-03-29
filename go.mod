@@ -1,4 +1,4 @@
-module github.com/aerogo/http/client
+module github.com/aerogo/http
 
 go 1.12
 
