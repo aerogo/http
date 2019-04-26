@@ -124,7 +124,19 @@ func (http *Client) Do() error {
 	}
 
 	var requestHeaders bytes.Buffer
-	fmt.Fprintf(&requestHeaders, "GET / HTTP/1.1\r\nHost: %s\r\n\r\n", hostName)
+
+	requestHeaders.WriteString("GET / HTTP/1.1\r\nHost: ")
+	requestHeaders.WriteString(hostName)
+	requestHeaders.WriteString("\r\n")
+
+	for key, value := range http.request.headers {
+		requestHeaders.WriteString(key)
+		requestHeaders.WriteString(": ")
+		requestHeaders.WriteString(value)
+		requestHeaders.WriteString("\r\n")
+	}
+
+	requestHeaders.WriteString("\r\n")
 
 	connection.SetNoDelay(true)
 	connection.Write(requestHeaders.Bytes())
@@ -173,14 +185,14 @@ func (http *Client) End() (*Response, error) {
 	return &http.response, err
 }
 
-// // EndStruct executes the request, unmarshals the response body into a struct and returns the response.
-// func (http *Client) EndStruct(obj interface{}) (*Response, error) {
-// 	err := http.Do()
+// EndStruct executes the request, unmarshals the response body into a struct and returns the response.
+func (http *Client) EndStruct(obj interface{}) (*Response, error) {
+	err := http.Do()
 
-// 	if err != nil {
-// 		return &http.response, err
-// 	}
+	if err != nil {
+		return &http.response, err
+	}
 
-// 	err = http.response.Unmarshal(obj)
-// 	return &http.response, err
-// }
+	err = http.response.Unmarshal(obj)
+	return &http.response, err
+}

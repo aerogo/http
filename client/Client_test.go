@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const path = "http://localhost:4000/"
+const path = "http://localhost:4000"
 
 func TestClient(t *testing.T) {
 	response, err := client.Get(path).End()
@@ -15,7 +15,14 @@ func TestClient(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 200, response.StatusCode())
 	assert.NotEmpty(t, response.String())
-	println(response.String())
+}
+
+func TestClientNoGZip(t *testing.T) {
+	response, err := client.Get(path).Header("Accept-Encoding", "identity").End()
+
+	assert.NoError(t, err)
+	assert.Equal(t, 200, response.StatusCode())
+	assert.NotEmpty(t, response.String())
 }
 
 func BenchmarkClient(b *testing.B) {
