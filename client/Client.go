@@ -123,6 +123,8 @@ func (http *Client) Do() error {
 		return err
 	}
 
+	defer connection.Close()
+
 	var requestHeaders bytes.Buffer
 
 	requestHeaders.WriteString("GET / HTTP/1.1\r\nHost: ")
