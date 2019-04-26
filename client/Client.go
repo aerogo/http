@@ -6,6 +6,7 @@ import (
 	"log"
 	"net"
 	"net/url"
+	"strconv"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -99,7 +100,8 @@ func (http *Client) Response() *Response {
 
 // Do executes the request and returns the response.
 func (http *Client) Do() error {
-	ips, err := net.LookupIP(http.request.url.Hostname())
+	hostName := http.request.url.Hostname()
+	ips, err := net.LookupIP(hostName)
 
 	if err != nil {
 		return err
@@ -109,9 +111,10 @@ func (http *Client) Do() error {
 		return fmt.Errorf("Could not resolve host: %s", http.request.url.Hostname())
 	}
 
+	port, _ := strconv.Atoi(http.request.url.Port())
 	remoteAddress := net.TCPAddr{
 		IP:   ips[0],
-		Port: 80,
+		Port: port,
 	}
 
 	connection, err := net.DialTCP("tcp", nil, &remoteAddress)
@@ -120,8 +123,11 @@ func (http *Client) Do() error {
 		return err
 	}
 
+	var requestHeaders bytes.Buffer
+	fmt.Fprintf(&requestHeaders, "GET / HTTP/1.1\r\nHost: %s\r\n\r\n", hostName)
+
 	connection.SetNoDelay(true)
-	connection.Write([]byte("GET / HTTP/1.1\r\nHost: notify.moe\r\n\r\n"))
+	connection.Write(requestHeaders.Bytes())
 
 	var header bytes.Buffer
 	var body bytes.Buffer
