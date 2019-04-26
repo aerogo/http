@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"net"
 	"net/url"
@@ -98,8 +99,18 @@ func (http *Client) Response() *Response {
 
 // Do executes the request and returns the response.
 func (http *Client) Do() error {
+	ips, err := net.LookupIP(http.request.url.Hostname())
+
+	if err != nil {
+		return err
+	}
+
+	if len(ips) == 0 {
+		return fmt.Errorf("Could not resolve host: %s", http.request.url.Hostname())
+	}
+
 	remoteAddress := net.TCPAddr{
-		IP:   net.ParseIP("165.22.146.88"),
+		IP:   ips[0],
 		Port: 80,
 	}
 
@@ -120,7 +131,7 @@ func (http *Client) Do() error {
 
 	for {
 		n, err := connection.Read(tmp)
-		headerEnd := bytes.Index(tmp, []byte{'\r', '\n', '\r', '\n'})
+		headerEnd := bytes.Index(tmp, headerEndSequence)
 
 		if headerEnd != -1 {
 			header.Write(tmp[:headerEnd])
@@ -129,7 +140,7 @@ func (http *Client) Do() error {
 
 			// Find content length
 			http.response.header = header.Bytes()
-			lengthSlice := http.response.Header([]byte("Content-Length"))
+			lengthSlice := http.response.Header(contentLengthHeader)
 			contentLength = asciiToInt(lengthSlice)
 
 			// Find status
