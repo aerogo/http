@@ -125,6 +125,7 @@ func (http *Client) Do() error {
 
 	defer connection.Close()
 
+	// Create request headers
 	var requestHeaders bytes.Buffer
 
 	requestHeaders.WriteString("GET / HTTP/1.1\r\nHost: ")
