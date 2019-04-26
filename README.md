@@ -4,7 +4,7 @@ Provides HTTP utilities. Currently it offers a fast and easy-to-use HTTP client.
 
 ## Installation
 
-```
+```shell
 go get github.com/aerogo/http/client
 ```
 
