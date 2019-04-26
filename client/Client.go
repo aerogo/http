@@ -2,11 +2,13 @@ package client
 
 import (
 	"bytes"
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -100,35 +102,76 @@ func (http *Client) Response() *Response {
 
 // Do executes the request and returns the response.
 func (http *Client) Do() error {
+	var connection net.Conn
+	var err error
+
 	hostName := http.request.url.Hostname()
-	ips, err := net.LookupIP(hostName)
-
-	if err != nil {
-		return err
-	}
-
-	if len(ips) == 0 {
-		return fmt.Errorf("Could not resolve host: %s", http.request.url.Hostname())
-	}
-
 	port, _ := strconv.Atoi(http.request.url.Port())
-	remoteAddress := net.TCPAddr{
-		IP:   ips[0],
-		Port: port,
+	path := http.request.url.Path
+
+	if port == 0 {
+		if http.request.url.Scheme == "https" {
+			port = 443
+		} else {
+			port = 80
+		}
 	}
 
-	connection, err := net.DialTCP("tcp", nil, &remoteAddress)
+	if !strings.HasPrefix(path, "/") {
+		path = "/" + path
+	}
 
-	if err != nil {
-		return err
+	if http.request.url.Scheme == "https" {
+		// TLS
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: true,
+		}
+
+		connection, err = tls.Dial("tcp", fmt.Sprintf("%s:%d", hostName, port), tlsConfig)
+
+		if err != nil {
+			return err
+		}
+	} else {
+		ips, err := net.LookupIP(hostName)
+
+		if err != nil {
+			return err
+		}
+
+		if len(ips) == 0 {
+			return fmt.Errorf("Could not resolve host: %s", hostName)
+		}
+
+		remoteAddress := net.TCPAddr{
+			IP:   ips[0],
+			Port: port,
+		}
+
+		connection, err = net.DialTCP("tcp", nil, &remoteAddress)
+
+		if err != nil {
+			return err
+		}
+
+		connection.(*net.TCPConn).SetNoDelay(true)
 	}
 
 	defer connection.Close()
 
+	// tlsClient := tls.Client(connection, tlsConfig)
+	// err = tlsClient.Handshake()
+
+	// if err != nil {
+	// 	return err
+	// }
+
 	// Create request headers
 	var requestHeaders bytes.Buffer
 
-	requestHeaders.WriteString("GET / HTTP/1.1\r\nHost: ")
+	requestHeaders.WriteString("GET ")
+	requestHeaders.WriteString(path)
+	requestHeaders.WriteString(" HTTP/1.1\r\nHost: ")
 	requestHeaders.WriteString(hostName)
 	requestHeaders.WriteString("\r\n")
 
@@ -141,7 +184,6 @@ func (http *Client) Do() error {
 
 	requestHeaders.WriteString("\r\n")
 
-	connection.SetNoDelay(true)
 	connection.Write(requestHeaders.Bytes())
 
 	var header bytes.Buffer
