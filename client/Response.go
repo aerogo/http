@@ -8,13 +8,14 @@ import (
 
 // Response represents the HTTP response used in the given client.
 type Response struct {
-	header []byte
-	body   []byte
+	header     []byte
+	body       []byte
+	statusCode int
 }
 
 // StatusCode returns the status code of the response.
 func (response Response) StatusCode() int {
-	return 0
+	return response.statusCode
 }
 
 // String returns the response body as a string.

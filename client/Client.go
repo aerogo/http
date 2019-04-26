@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"log"
-	"math"
 	"net"
 	"net/url"
 
@@ -111,7 +110,7 @@ func (http *Client) Do() error {
 	}
 
 	connection.SetNoDelay(true)
-	connection.Write([]byte("GET / HTTP/1.1\r\nHost: notify.moe\r\nAccept: */*\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)\r\n\r\n"))
+	connection.Write([]byte("GET / HTTP/1.1\r\nHost: notify.moe\r\n\r\n"))
 
 	var header bytes.Buffer
 	var body bytes.Buffer
@@ -127,30 +126,26 @@ func (http *Client) Do() error {
 			header.Write(tmp[:headerEnd])
 			body.Write(tmp[headerEnd+4 : n])
 			current = &body
-			println(header.String())
 
 			// Find content length
 			http.response.header = header.Bytes()
 			lengthSlice := http.response.Header([]byte("Content-Length"))
+			contentLength = asciiToInt(lengthSlice)
 
-			// Convert it to an integer
-			for i := 0; i < len(lengthSlice); i++ {
-				contentLength += (int(lengthSlice[i]) - 48) * int(math.Pow10(len(lengthSlice)-i-1))
-			}
+			// Find status
+			statusPos := bytes.IndexByte(http.response.header, ' ')
+			statusSlice := http.response.header[statusPos+1 : statusPos+4]
+			http.response.statusCode = asciiToInt(statusSlice)
 
+			// Reserve space for the content length
 			body.Grow(contentLength)
 		} else {
 			current.Write(tmp[:n])
 		}
 
-		if err != nil {
+		if err != nil || body.Len() >= contentLength {
 			http.response.body = body.Bytes()
 			return err
-		}
-
-		if body.Len() >= contentLength {
-			http.response.body = body.Bytes()
-			return nil
 		}
 	}
 }

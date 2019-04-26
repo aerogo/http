@@ -10,11 +10,11 @@ import (
 const path = "https://notify.moe/"
 
 func TestClient(t *testing.T) {
-	resp, err := client.Get(path).End()
+	response, err := client.Get(path).End()
 
 	assert.NoError(t, err)
-	assert.Equal(t, 200, resp.StatusCode())
-	assert.NotEmpty(t, resp.String())
+	assert.Equal(t, 200, response.StatusCode())
+	assert.NotEmpty(t, response.String())
 }
 
 func BenchmarkClient(b *testing.B) {
@@ -29,9 +29,9 @@ func BenchmarkClientWithBody(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		resp, _ := client.Get(path).End()
+		response, _ := client.Get(path).End()
 
-		if resp.String() == "" {
+		if response.String() == "" {
 			b.Error("Empty response")
 		}
 	}
