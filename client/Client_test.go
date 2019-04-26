@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const path = "https://github.com"
+const path = "https://notify.moe/"
 
 func TestClient(t *testing.T) {
 	resp, err := client.Get(path).End()
