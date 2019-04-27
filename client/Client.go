@@ -17,7 +17,11 @@ type Client struct {
 
 // Get builds a GET request.
 func Get(path string) *Client {
-	parsedURL, _ := url.Parse(path)
+	parsedURL, err := url.Parse(path)
+
+	if err != nil {
+		panic("Invalid URL: " + path)
+	}
 
 	http := &Client{
 		request: request{
@@ -36,21 +40,9 @@ func Get(path string) *Client {
 
 // Post builds a POST request.
 func Post(path string) *Client {
-	parsedURL, _ := url.Parse(path)
-
-	http := &Client{
-		request: request{
-			method: "POST",
-			url:    parsedURL,
-			headers: Headers{
-				"Host":            parsedURL.Hostname(),
-				"Accept-Encoding": "gzip",
-				"Accept":          "*/*",
-			},
-		},
-	}
-
-	return http
+	client := Get(path)
+	client.request.method = "POST"
+	return client
 }
 
 // Header sets one HTTP header for the request.
