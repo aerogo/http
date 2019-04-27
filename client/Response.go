@@ -19,6 +19,11 @@ func (response Response) StatusCode() int {
 	return response.statusCode
 }
 
+// Ok returns true if the HTTP status code is not lower than 200 and not 400 or higher.
+func (response Response) Ok() bool {
+	return response.statusCode >= 200 && response.statusCode < 400
+}
+
 // Header returns the value for the given header.
 func (response Response) Header(name []byte) []byte {
 	start := bytes.Index(response.header, name)
