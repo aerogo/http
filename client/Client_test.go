@@ -24,31 +24,31 @@ var urls = []string{
 	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate%20stay%20night",
 	"http://cal.syoboi.jp",
 
-	// These are failing atm:
-
+	// These are failing atm due to wrong status codes returned by the server:
 	// "https://kitsu.io",
+}
+
+func testResponse(t *testing.T, response *client.Response, err error) {
+	assert.NoError(t, err)
+	assert.True(t, response.Ok())
+	assert.True(t, len(response.String()) >= 0 || response.HeaderString("Location") != "")
 }
 
 func TestClient(t *testing.T) {
 	for _, url := range urls {
 		println("URL", url)
 		response, err := client.Get(url).End()
-
-		assert.NoError(t, err)
-		assert.True(t, response.Ok())
-		assert.True(t, len(response.String()) >= 0 || response.HeaderString("Location") != "")
+		testResponse(t, response, err)
 	}
 }
 
-// func TestClientNoGZip(t *testing.T) {
-// 	for _, url := range urls {
-// 		response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
-
-// 		assert.NoError(t, err)
-// 		assert.True(t, response.Ok())
-// 		assert.NotEmpty(t, response.String())
-// 	}
-// }
+func TestClientNoGZip(t *testing.T) {
+	for _, url := range urls {
+		println("URL", url)
+		response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
+		testResponse(t, response, err)
+	}
+}
 
 func BenchmarkClient(b *testing.B) {
 	b.ReportAllocs()
