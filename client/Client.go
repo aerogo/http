@@ -71,14 +71,20 @@ func (http *Client) Headers(headers Headers) *Client {
 }
 
 // Body sets the request body.
-func (http *Client) Body(raw string) *Client {
+func (http *Client) Body(raw []byte) *Client {
 	http.request.body = raw
+	return http
+}
+
+// BodyString sets the request body.
+func (http *Client) BodyString(raw string) *Client {
+	http.request.body = []byte(raw)
 	return http
 }
 
 // BodyJSON sets the request body by converting the object to JSON.
 func (http *Client) BodyJSON(obj interface{}) *Client {
-	data, err := jsoniter.MarshalToString(obj)
+	data, err := jsoniter.Marshal(obj)
 
 	if err != nil {
 		log.Printf("Error converting request body to JSON: %v", err)
@@ -86,12 +92,6 @@ func (http *Client) BodyJSON(obj interface{}) *Client {
 	}
 
 	http.request.body = data
-	return http
-}
-
-// BodyBytes sets the request body as a byte slice.
-func (http *Client) BodyBytes(raw []byte) *Client {
-	http.request.body = string(raw)
 	return http
 }
 

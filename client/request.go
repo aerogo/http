@@ -6,6 +6,6 @@ import "net/url"
 type request struct {
 	method  string
 	url     *url.URL
-	body    string
+	body    []byte
 	headers Headers
 }

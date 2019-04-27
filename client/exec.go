@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"crypto/tls"
+	"fmt"
 	"github.com/aerogo/http/ciphers"
 	"net"
 	"strconv"
@@ -59,24 +60,29 @@ func (http *Client) exec(ip net.IP) error {
 	defer connection.Close()
 
 	// Create request headers
-	var requestHeaders bytes.Buffer
+	var requestContents bytes.Buffer
 
-	requestHeaders.WriteString(http.request.method)
-	requestHeaders.WriteByte(' ')
-	requestHeaders.WriteString(http.request.url.RequestURI())
-	requestHeaders.WriteString(" HTTP/1.1\r\n")
+	requestContents.WriteString(http.request.method)
+	requestContents.WriteByte(' ')
+	requestContents.WriteString(http.request.url.RequestURI())
+	requestContents.WriteString(" HTTP/1.1\r\n")
 
 	for key, value := range http.request.headers {
-		requestHeaders.WriteString(key)
-		requestHeaders.WriteString(": ")
-		requestHeaders.WriteString(value)
-		requestHeaders.WriteString("\r\n")
+		requestContents.WriteString(key)
+		requestContents.WriteString(": ")
+		requestContents.WriteString(value)
+		requestContents.WriteString("\r\n")
 	}
 
-	requestHeaders.WriteString("\r\n")
+	if len(http.request.body) > 0 {
+		fmt.Fprintf(&requestContents, "Content-Length: %d\r\n", len(http.request.body))
+	}
 
-	// Send request
-	_, err = connection.Write(requestHeaders.Bytes())
+	requestContents.WriteString("\r\n")
+	requestContents.Write(http.request.body)
+
+	// Send request headers
+	_, err = connection.Write(requestContents.Bytes())
 
 	if err != nil {
 		return err
