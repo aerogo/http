@@ -8,18 +8,28 @@ import (
 )
 
 var urls = []string{
+	// Popular stuff
 	"https://google.com",
 	"https://github.com",
 	"https://facebook.com",
 	"https://twitter.com",
 	"https://youtube.com",
+	"https://naver.com",
+
+	// Anime friends
+	"https://notify.moe",
+	"https://myanimelist.net",
+	"http://cal.syoboi.jp",
+
+	// These are failing atm:
+	// "https://anilist.co",
+	// "https://kitsu.io",
 }
 
 func TestClient(t *testing.T) {
 	for _, url := range urls {
 		println("URL", url)
 		response, err := client.Get(url).End()
-		println()
 
 		assert.NoError(t, err)
 		assert.True(t, response.Ok())

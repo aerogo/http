@@ -26,13 +26,13 @@ func (response Response) Ok() bool {
 
 // Header returns the value for the given header.
 func (response Response) Header(name []byte) []byte {
-	start := bytes.Index(response.header, name)
+	start := bytes.Index(response.header, append(newlineSequence, name...))
 
 	if start == -1 {
 		return nil
 	}
 
-	start += len(name) + 2
+	start += len(newlineSequence) + len(name) + len(": ")
 	remaining := response.header[start:]
 	end := bytes.IndexByte(remaining, '\r')
 
@@ -46,6 +46,16 @@ func (response Response) Header(name []byte) []byte {
 // HeaderString returns the string value for the given header.
 func (response Response) HeaderString(name string) string {
 	return string(response.Header([]byte(name)))
+}
+
+// RawHeaders returns headers as a byte slice.
+func (response Response) RawHeaders() []byte {
+	return response.header
+}
+
+// RawHeadersString returns headers as a string.
+func (response Response) RawHeadersString() string {
+	return string(response.header)
 }
 
 // Bytes returns the response body as a byte slice and unzips gzipped content when necessary.

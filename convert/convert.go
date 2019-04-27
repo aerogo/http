@@ -38,10 +38,12 @@ func ASCIIHexToInt(slice []byte) int {
 			// Numbers
 			num += (code - 48) * pow16[pos]
 		} else if code >= 65 && code <= 70 {
-			// Letters
+			// Letters (uppercase)
 			num += (code - 65 + 10) * pow16[pos]
+		} else if code >= 97 && code <= 102 {
+			// Letters (lowercase)
+			num += (code - 97 + 10) * pow16[pos]
 		}
-
 	}
 
 	return num

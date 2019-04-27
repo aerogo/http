@@ -26,8 +26,9 @@ func Get(path string) *Client {
 			method: "GET",
 			url:    parsedURL,
 			headers: Headers{
-				"Accept-Encoding": "gzip",
 				"Host":            parsedURL.Hostname(),
+				"Accept-Encoding": "gzip",
+				"Accept":          "*/*",
 			},
 		},
 	}
@@ -44,8 +45,9 @@ func Post(path string) *Client {
 			method: "POST",
 			url:    parsedURL,
 			headers: Headers{
-				"Accept-Encoding": "gzip",
 				"Host":            parsedURL.Hostname(),
+				"Accept-Encoding": "gzip",
+				"Accept":          "*/*",
 			},
 		},
 	}

@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"crypto/tls"
+	"github.com/aerogo/http/ciphers"
 	"net"
 	"strconv"
 	"strings"
@@ -47,7 +48,11 @@ func (http *Client) exec(ip net.IP) error {
 	if http.request.url.Scheme == "https" {
 		// TLS
 		tlsConfig := &tls.Config{
-			InsecureSkipVerify: true,
+			CipherSuites:             ciphers.List,
+			PreferServerCipherSuites: true,
+			InsecureSkipVerify:       true,
+			MinVersion:               tls.VersionTLS12,
+			MaxVersion:               tls.VersionTLS13,
 		}
 
 		connection = tls.Client(connection, tlsConfig)
@@ -139,8 +144,6 @@ func (http *Client) exec(ip net.IP) error {
 						makeUpper = false
 					}
 				}
-
-				println(string(http.response.header))
 
 				// Find content length
 				transferSlice := http.response.Header(transferEncodingHeader)
