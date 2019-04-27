@@ -32,7 +32,7 @@ func (response Response) Header(name []byte) []byte {
 	end := bytes.IndexByte(remaining, '\r')
 
 	if end == -1 {
-		return nil
+		return remaining
 	}
 
 	return remaining[:end]

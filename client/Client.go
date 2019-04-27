@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/aerogo/http/convert"
 	jsoniter "github.com/json-iterator/go"
 )
 
@@ -174,43 +175,77 @@ func (http *Client) Do() error {
 
 	requestHeaders.WriteString("\r\n")
 
+	// Send request
 	connection.Write(requestHeaders.Bytes())
 
-	var header bytes.Buffer
-	var body bytes.Buffer
-	current := &header
+	// Receive response
+	var response bytes.Buffer
 	tmp := make([]byte, 16384)
 	contentLength := 0
+	isChunked := false
+	headerEndPosition := -1
+	bodyStartPosition := 0
+	lastChunkPosition := -1
+
+	// Create another buffer just for chunked responses
+	var decodedChunks bytes.Buffer
 
 	for {
 		n, err := connection.Read(tmp)
-		headerEnd := bytes.Index(tmp, headerEndSequence)
+		response.Write(tmp[:n])
 
-		if headerEnd != -1 {
-			header.Write(tmp[:headerEnd])
-			body.Write(tmp[headerEnd+4 : n])
-			current = &body
+		// Find headers
+		if headerEndPosition == -1 {
+			doubleNewlinePos := bytes.Index(tmp, doubleNewlineSequence)
 
-			// Find content length
-			http.response.header = header.Bytes()
-			lengthSlice := http.response.Header(contentLengthHeader)
-			contentLength = asciiToInt(lengthSlice)
+			if doubleNewlinePos != -1 {
+				headerEndPosition = response.Len() - n + doubleNewlinePos
+				bodyStartPosition = headerEndPosition + len(doubleNewlineSequence)
+				lastChunkPosition = bodyStartPosition
+				http.response.header = response.Bytes()[:headerEndPosition]
 
-			// Find status
-			statusPos := bytes.IndexByte(http.response.header, ' ')
-			statusSlice := http.response.header[statusPos+1 : statusPos+4]
-			http.response.statusCode = asciiToInt(statusSlice)
+				// Find status
+				statusPos := bytes.IndexByte(http.response.header, ' ')
+				statusSlice := http.response.header[statusPos+1 : statusPos+4]
+				http.response.statusCode = convert.ASCIIDecToInt(statusSlice)
 
-			// Reserve space for the content length
-			body.Grow(contentLength)
-			println(header.String())
-		} else {
-			current.Write(tmp[:n])
+				// Find content length
+				transferSlice := http.response.Header(transferEncodingHeader)
+
+				if bytes.Equal(transferSlice, chunkedEncoding) {
+					isChunked = true
+				} else {
+					lengthSlice := http.response.Header(contentLengthHeader)
+					contentLength = convert.ASCIIDecToInt(lengthSlice)
+					response.Grow(contentLength)
+				}
+			}
 		}
 
-		if err != nil || body.Len() >= contentLength {
-			http.response.body = body.Bytes()
+		// Read chunks
+		if isChunked {
+			chunkBytes := response.Bytes()[lastChunkPosition:]
+			chunkBytesRead, finished := decodeChunks(chunkBytes, &decodedChunks)
+
+			// If we read the last chunk, we're finished here
+			if finished {
+				http.response.body = decodedChunks.Bytes()
+				return nil
+			}
+
+			lastChunkPosition += chunkBytesRead
+		}
+
+		// End response on error
+		if err != nil {
+			http.response.body = response.Bytes()[bodyStartPosition:]
 			return err
+		}
+
+		// End response if content length has been reached
+		if !isChunked && response.Len()-bodyStartPosition >= contentLength {
+			http.response.body = response.Bytes()[bodyStartPosition:]
+			return nil
 		}
 	}
 }
