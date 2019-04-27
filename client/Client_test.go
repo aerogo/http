@@ -18,13 +18,14 @@ var urls = []string{
 
 	// Anime friends
 	"https://notify.moe",
-	"http://cal.syoboi.jp",
+	"https://anilist.co",
 	"https://myanimelist.net",
 	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate stay night",
 	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate%20stay%20night",
+	"http://cal.syoboi.jp",
 
 	// These are failing atm:
-	// "https://anilist.co",
+
 	// "https://kitsu.io",
 }
 

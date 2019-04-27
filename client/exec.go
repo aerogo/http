@@ -11,6 +11,8 @@ import (
 	"github.com/aerogo/http/convert"
 )
 
+var clientSessionCache = tls.NewLRUClientSessionCache(0)
+
 // exec executes the request and returns the respense for the given IP.
 func (http *Client) exec(ip net.IP) error {
 	var connection net.Conn
@@ -42,11 +44,12 @@ func (http *Client) exec(ip net.IP) error {
 	if http.request.url.Scheme == "https" {
 		// TLS
 		tlsConfig := &tls.Config{
-			CipherSuites:             ciphers.List,
-			PreferServerCipherSuites: true,
-			InsecureSkipVerify:       true,
-			MinVersion:               tls.VersionTLS12,
-			MaxVersion:               tls.VersionTLS13,
+			ServerName:         http.request.url.Hostname(),
+			MinVersion:         tls.VersionTLS12,
+			MaxVersion:         tls.VersionTLS13,
+			CipherSuites:       ciphers.List,
+			ClientSessionCache: clientSessionCache,
+			InsecureSkipVerify: true,
 		}
 
 		connection = tls.Client(connection, tlsConfig)
