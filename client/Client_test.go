@@ -8,7 +8,7 @@ import (
 )
 
 var urls = []string{
-	// Popular stuff
+	// // Popular stuff
 	"https://google.com",
 	"https://github.com",
 	"https://facebook.com",
@@ -18,8 +18,10 @@ var urls = []string{
 
 	// Anime friends
 	"https://notify.moe",
-	"https://myanimelist.net",
 	"http://cal.syoboi.jp",
+	"https://myanimelist.net",
+	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate stay night",
+	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate%20stay%20night",
 
 	// These are failing atm:
 	// "https://anilist.co",

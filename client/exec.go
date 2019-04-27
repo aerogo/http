@@ -6,7 +6,6 @@ import (
 	"github.com/aerogo/http/ciphers"
 	"net"
 	"strconv"
-	"strings"
 	"unicode"
 
 	"github.com/aerogo/http/convert"
@@ -18,7 +17,6 @@ func (http *Client) exec(ip net.IP) error {
 	var err error
 
 	port, _ := strconv.Atoi(http.request.url.Port())
-	path := http.request.url.Path
 
 	if port == 0 {
 		if http.request.url.Scheme == "https" {
@@ -26,10 +24,6 @@ func (http *Client) exec(ip net.IP) error {
 		} else {
 			port = 80
 		}
-	}
-
-	if !strings.HasPrefix(path, "/") {
-		path = "/" + path
 	}
 
 	remoteAddress := net.TCPAddr{
@@ -66,7 +60,7 @@ func (http *Client) exec(ip net.IP) error {
 
 	requestHeaders.WriteString(http.request.method)
 	requestHeaders.WriteByte(' ')
-	requestHeaders.WriteString(path)
+	requestHeaders.WriteString(http.request.url.RequestURI())
 	requestHeaders.WriteString(" HTTP/1.1\r\n")
 
 	for key, value := range http.request.headers {
