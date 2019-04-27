@@ -15,6 +15,7 @@ var urls = []string{
 	"https://twitter.com",
 	"https://youtube.com",
 	"https://naver.com",
+	"https://cloudflare.com",
 
 	// Anime friends
 	"https://notify.moe",

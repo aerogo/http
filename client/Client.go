@@ -15,8 +15,6 @@ type Client struct {
 	response Response
 }
 
-// strings.Replace(path, " ", "%20", -1)
-
 // Get builds a GET request.
 func Get(path string) *Client {
 	parsedURL, _ := url.Parse(path)
