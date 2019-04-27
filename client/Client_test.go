@@ -8,7 +8,7 @@ import (
 )
 
 var urls = []string{
-	// // Popular stuff
+	// Popular stuff
 	"https://google.com",
 	"https://github.com",
 	"https://facebook.com",
