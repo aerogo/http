@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const url = "https://localhost:4001"
+const url = "https://notify.moe"
 
 func TestClient(t *testing.T) {
 	response, err := client.Get(url).End()

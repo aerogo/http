@@ -121,50 +121,40 @@ func (http *Client) Do() error {
 		path = "/" + path
 	}
 
+	ips, err := net.LookupIP(hostName)
+
+	if err != nil {
+		return err
+	}
+
+	if len(ips) == 0 {
+		return fmt.Errorf("Could not resolve host: %s", hostName)
+	}
+
+	remoteAddress := net.TCPAddr{
+		IP:   ips[0],
+		Port: port,
+	}
+
+	connection, err = net.DialTCP("tcp", nil, &remoteAddress)
+
+	if err != nil {
+		return err
+	}
+
+	connection.(*net.TCPConn).SetNoDelay(true)
+
 	if http.request.url.Scheme == "https" {
 		// TLS
 		tlsConfig := &tls.Config{
 			InsecureSkipVerify: true,
 		}
 
-		connection, err = tls.Dial("tcp", fmt.Sprintf("%s:%d", hostName, port), tlsConfig)
-
-		if err != nil {
-			return err
-		}
-	} else {
-		ips, err := net.LookupIP(hostName)
-
-		if err != nil {
-			return err
-		}
-
-		if len(ips) == 0 {
-			return fmt.Errorf("Could not resolve host: %s", hostName)
-		}
-
-		remoteAddress := net.TCPAddr{
-			IP:   ips[0],
-			Port: port,
-		}
-
-		connection, err = net.DialTCP("tcp", nil, &remoteAddress)
-
-		if err != nil {
-			return err
-		}
-
-		connection.(*net.TCPConn).SetNoDelay(true)
+		connection = tls.Client(connection, tlsConfig)
 	}
 
+	// Make sure we close the connection
 	defer connection.Close()
-
-	// tlsClient := tls.Client(connection, tlsConfig)
-	// err = tlsClient.Handshake()
-
-	// if err != nil {
-	// 	return err
-	// }
 
 	// Create request headers
 	var requestHeaders bytes.Buffer
@@ -213,6 +203,7 @@ func (http *Client) Do() error {
 
 			// Reserve space for the content length
 			body.Grow(contentLength)
+			println(header.String())
 		} else {
 			current.Write(tmp[:n])
 		}

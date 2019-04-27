@@ -47,19 +47,19 @@ func (response Response) HeaderString(name string) string {
 func (response Response) Bytes() []byte {
 	encoding := response.Header(contentEncodingHeader)
 
-	if bytes.Equal(encoding, gzipAccept) {
-		bodyReader := bytes.NewReader(response.body)
-		gzipReader := acquireGZipReader(bodyReader)
-		unzipped, err := ioutil.ReadAll(gzipReader)
-
-		if err != nil {
-			return response.body
-		}
-
-		return unzipped
+	if !bytes.Equal(encoding, gzipAccept) {
+		return response.body
 	}
 
-	return response.body
+	bodyReader := bytes.NewReader(response.body)
+	gzipReader := acquireGZipReader(bodyReader)
+	unzipped, err := ioutil.ReadAll(gzipReader)
+
+	if err != nil {
+		return response.body
+	}
+
+	return unzipped
 }
 
 // String returns the response body as a string.
