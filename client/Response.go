@@ -67,7 +67,12 @@ func (response Response) Bytes() []byte {
 	}
 
 	bodyReader := bytes.NewReader(response.body)
-	gzipReader := acquireGZipReader(bodyReader)
+	gzipReader, err := acquireGZipReader(bodyReader)
+
+	if err != nil {
+		return response.body
+	}
+
 	unzipped, err := ioutil.ReadAll(gzipReader)
 
 	if err != nil {

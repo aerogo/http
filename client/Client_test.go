@@ -55,7 +55,11 @@ func BenchmarkClient(b *testing.B) {
 	b.ReportAllocs()
 
 	for i := 0; i < b.N; i++ {
-		client.Get(urls[0]).End()
+		_, err := client.Get(urls[0]).End()
+
+		if err != nil {
+			b.Fail()
+		}
 	}
 }
 

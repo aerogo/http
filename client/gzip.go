@@ -11,16 +11,15 @@ import (
 var gzipReaderPool sync.Pool
 
 // acquireGZipReader will return a clean gzip reader from the pool.
-func acquireGZipReader(request io.Reader) *gzip.Reader {
-	var reader *gzip.Reader
+func acquireGZipReader(request io.Reader) (*gzip.Reader, error) {
 	obj := gzipReaderPool.Get()
 
 	if obj == nil {
-		reader, _ = gzip.NewReader(request)
-		return reader
+		reader, err := gzip.NewReader(request)
+		return reader, err
 	}
 
-	reader = obj.(*gzip.Reader)
-	reader.Reset(request)
-	return reader
+	reader := obj.(*gzip.Reader)
+	err := reader.Reset(request)
+	return reader, err
 }

@@ -40,7 +40,11 @@ func (http *Client) exec(ip net.IP) error {
 		return err
 	}
 
-	connection.(*net.TCPConn).SetNoDelay(true)
+	err = connection.(*net.TCPConn).SetNoDelay(true)
+
+	if err != nil {
+		return err
+	}
 
 	if http.request.url.Scheme == "https" {
 		// TLS
