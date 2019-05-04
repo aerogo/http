@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"io"
 	"io/ioutil"
 
 	jsoniter "github.com/json-iterator/go"
@@ -80,6 +81,48 @@ func (response Response) Bytes() []byte {
 	}
 
 	return unzipped
+}
+
+// WriteTo writes the response body into the given writer.
+func (response Response) WriteTo(writer io.Writer) (int64, error) {
+	var reader io.Reader
+	var err error
+	var totalBytesWritten int64
+
+	bodyReader := bytes.NewReader(response.body)
+	reader = bodyReader
+	encoding := response.Header(contentEncodingHeader)
+
+	if bytes.Equal(encoding, gzipAccept) {
+		reader, err = acquireGZipReader(bodyReader)
+
+		if err != nil {
+			reader = bodyReader
+		}
+	}
+
+	buffer := make([]byte, 4096)
+
+	for {
+		// Read a chunk
+		n, err := reader.Read(buffer)
+
+		if err != nil && err != io.EOF {
+			return totalBytesWritten, err
+		}
+
+		if n == 0 {
+			return totalBytesWritten, nil
+		}
+
+		// Write a chunk
+		bytesWritten, err := writer.Write(buffer[:n])
+		totalBytesWritten += int64(bytesWritten)
+
+		if err != nil {
+			return totalBytesWritten, err
+		}
+	}
 }
 
 // String returns the response body as a string.

@@ -1,6 +1,7 @@
 package client_test
 
 import (
+	"io/ioutil"
 	"testing"
 
 	"github.com/aerogo/http/client"
@@ -40,6 +41,8 @@ func TestClient(t *testing.T) {
 		println("URL", url)
 		response, err := client.Get(url).End()
 		testResponse(t, response, err)
+		_, err = response.WriteTo(ioutil.Discard)
+		assert.NoError(t, err)
 	}
 }
 
@@ -48,6 +51,8 @@ func TestClientNoGZip(t *testing.T) {
 		println("URL", url)
 		response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
 		testResponse(t, response, err)
+		_, err = response.WriteTo(ioutil.Discard)
+		assert.NoError(t, err)
 	}
 }
 
