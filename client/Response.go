@@ -130,14 +130,19 @@ func (response Response) String() string {
 	return string(response.Bytes())
 }
 
-// RawBytes returns the raw response body as a byte slice.
-func (response Response) RawBytes() []byte {
+// Raw returns the raw response body as a byte slice.
+func (response Response) Raw() []byte {
 	return response.body
 }
 
 // RawString returns the raw response body as a string.
 func (response Response) RawString() string {
 	return string(response.body)
+}
+
+// RawLength returns the raw response length.
+func (response Response) RawLength() int {
+	return len(response.body)
 }
 
 // Unmarshal tries to JSON decode the response and save it in the object.

@@ -1,6 +1,7 @@
 package client_test
 
 import (
+	"bytes"
 	"io/ioutil"
 	"testing"
 
@@ -11,7 +12,6 @@ import (
 var urls = []string{
 	// Popular stuff
 	"https://google.com",
-	"https://github.com",
 	"https://facebook.com",
 	"https://twitter.com",
 	"https://youtube.com",
@@ -22,18 +22,26 @@ var urls = []string{
 	"https://notify.moe",
 	"https://anilist.co",
 	"https://myanimelist.net",
-	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate stay night",
-	"https://myanimelist.net/anime/356/Fate_stay_night?q=fate%20stay%20night",
-	"http://cal.syoboi.jp",
-
-	// These are failing atm due to wrong status codes returned by the server:
-	// "https://kitsu.io",
+	"https://notify.moe/search/fate stay night",
+	"https://notify.moe/search/fate%20stay%20night",
 }
 
 func testResponse(t *testing.T, response *client.Response, err error) {
 	assert.NoError(t, err)
 	assert.True(t, response.Ok())
-	assert.True(t, len(response.String()) >= 0 || response.HeaderString("Location") != "")
+	assert.NotZero(t, response.StatusCode())
+	assert.Equal(t, response.RawLength(), len(response.Raw()))
+	assert.Equal(t, response.RawLength(), len(response.RawString()))
+	assert.NotEmpty(t, response.RawHeaders())
+	assert.NotEmpty(t, response.RawHeadersString())
+
+	redirect := response.HeaderString("Location")
+	assert.True(t, len(response.String()) >= 0 || redirect != "")
+
+	buffer := bytes.Buffer{}
+	n, err := response.WriteTo(&buffer)
+	assert.NoError(t, err)
+	assert.True(t, int(n) >= response.RawLength())
 }
 
 func TestClient(t *testing.T) {
