@@ -32,10 +32,10 @@ response, err := client.Get("https://example.com").Header("Accept", "text/html")
 
 ## Response
 
-### Status code
+### Response body as bytes
 
 ```go
-response.StatusCode()
+response.Bytes()
 ```
 
 ### Response body as a string
@@ -44,10 +44,10 @@ response.StatusCode()
 response.String()
 ```
 
-### Response body as bytes
+### Status code
 
 ```go
-response.Bytes()
+response.StatusCode()
 ```
 
 ### Deserialize response body into an object (JSON)
@@ -56,16 +56,22 @@ response.Bytes()
 response.Unmarshal(&obj)
 ```
 
-### Response body as a string without unzipping gzip contents
+### Response body as bytes (without unzipping gzip contents)
+
+```go
+response.Raw()
+```
+
+### Response body as a string (without unzipping gzip contents)
 
 ```go
 response.RawString()
 ```
 
-### Response body as bytes without unzipping gzip contents
+### Response length (without unzipping gzip contents)
 
 ```go
-response.RawBytes()
+response.RawLength()
 ```
 
 {go:footer}
