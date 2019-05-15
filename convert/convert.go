@@ -19,7 +19,11 @@ func ASCIIDecToInt(slice []byte) int {
 	length := len(slice)
 
 	for i := 0; i < length; i++ {
-		num += (int(slice[i]) - 48) * pow10[length-i-1]
+		code := int(slice[i])
+
+		if code >= 48 && code <= 57 {
+			num += (code - 48) * pow10[length-i-1]
+		}
 	}
 
 	return num
@@ -34,14 +38,17 @@ func ASCIIHexToInt(slice []byte) int {
 		code := int(slice[i])
 		pos := length - i - 1
 
-		if code >= 48 && code <= 57 {
-			// Numbers
+		switch {
+		// Numbers
+		case code >= 48 && code <= 57:
 			num += (code - 48) * pow16[pos]
-		} else if code >= 65 && code <= 70 {
-			// Letters (uppercase)
+
+		// Letters (uppercase)
+		case code >= 65 && code <= 70:
 			num += (code - 65 + 10) * pow16[pos]
-		} else if code >= 97 && code <= 102 {
-			// Letters (lowercase)
+
+		// Letters (lowercase)
+		case code >= 97 && code <= 102:
 			num += (code - 97 + 10) * pow16[pos]
 		}
 	}
