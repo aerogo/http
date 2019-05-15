@@ -3,7 +3,7 @@ package client
 import (
 	"bytes"
 
-	"github.com/aerogo/http/convert"
+	"github.com/akyoto/stringutils/convert"
 )
 
 func decodeChunks(raw []byte, target *bytes.Buffer) (int, bool) {
@@ -16,7 +16,7 @@ func decodeChunks(raw []byte, target *bytes.Buffer) (int, bool) {
 			return bytesRead, false
 		}
 
-		expectedChunkBodyLength := convert.ASCIIHexToInt(raw[:newlinePosition])
+		expectedChunkBodyLength := convert.HexToInt(raw[:newlinePosition])
 
 		// A chunk with 0 length indicates that we're finished.
 		if expectedChunkBodyLength == 0 {
