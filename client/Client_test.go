@@ -36,7 +36,7 @@ func testResponse(t *testing.T, response *client.Response, err error) {
 	assert.NotEmpty(t, response.RawHeadersString())
 
 	redirect := response.HeaderString("Location")
-	assert.True(t, len(response.String()) >= 0 || redirect != "")
+	assert.True(t, len(response.String()) > 0 || redirect != "")
 
 	buffer := bytes.Buffer{}
 	n, err := response.WriteTo(&buffer)
