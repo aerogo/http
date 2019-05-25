@@ -18,6 +18,9 @@ var urls = []string{
 	"https://naver.com",
 	"https://cloudflare.com",
 
+	// Queries
+	"https://www.google.com/search?q=test",
+
 	// Anime friends
 	"https://notify.moe",
 	"https://anilist.co",
