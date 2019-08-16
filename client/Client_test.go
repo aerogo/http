@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/aerogo/http/client"
-	"github.com/stretchr/testify/assert"
+	"github.com/akyoto/assert"
 )
 
 var urls = []string{
@@ -30,21 +30,21 @@ var urls = []string{
 }
 
 func testResponse(t *testing.T, response *client.Response, err error) {
-	assert.NoError(t, err)
-	assert.True(t, response.Ok())
-	assert.NotZero(t, response.StatusCode())
+	assert.Nil(t, err)
+	assert.Equal(t, response.Ok(), true)
+	assert.NotEqual(t, response.StatusCode(), 0)
 	assert.Equal(t, response.RawLength(), len(response.Raw()))
 	assert.Equal(t, response.RawLength(), len(response.RawString()))
-	assert.NotEmpty(t, response.RawHeaders())
-	assert.NotEmpty(t, response.RawHeadersString())
+	assert.NotEqual(t, len(response.RawHeaders()), 0)
+	assert.NotEqual(t, len(response.RawHeadersString()), 0)
 
 	redirect := response.HeaderString("Location")
-	assert.True(t, len(response.String()) > 0 || redirect != "")
+	assert.Equal(t, len(response.String()) > 0 || redirect != "", true)
 
 	buffer := bytes.Buffer{}
 	n, err := response.WriteTo(&buffer)
-	assert.NoError(t, err)
-	assert.True(t, int(n) >= response.RawLength())
+	assert.Nil(t, err)
+	assert.Equal(t, int(n) >= response.RawLength(), true)
 }
 
 func TestClient(t *testing.T) {
@@ -53,7 +53,7 @@ func TestClient(t *testing.T) {
 		response, err := client.Get(url).End()
 		testResponse(t, response, err)
 		_, err = response.WriteTo(ioutil.Discard)
-		assert.NoError(t, err)
+		assert.Nil(t, err)
 	}
 }
 
@@ -63,7 +63,7 @@ func TestClientNoGZip(t *testing.T) {
 		response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
 		testResponse(t, response, err)
 		_, err = response.WriteTo(ioutil.Discard)
-		assert.NoError(t, err)
+		assert.Nil(t, err)
 	}
 }
 
