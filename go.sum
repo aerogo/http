@@ -1,5 +1,7 @@
 github.com/akyoto/assert v0.1.2 h1:w7zbCWcJWeLjZRycERyJppyPgzgMaeKUfN+kEFkqbTM=
 github.com/akyoto/assert v0.1.2/go.mod h1:g5e6ag+ksCEQENq/LnmU9z04wCAIFDr8KacBusVL0H8=
+github.com/akyoto/assert v0.1.3 h1:LlMrUom/k6Sp8GqptQqk3Cr6aDxxODbQO6AGIBB2oiY=
+github.com/akyoto/assert v0.1.3/go.mod h1:g5e6ag+ksCEQENq/LnmU9z04wCAIFDr8KacBusVL0H8=
 github.com/akyoto/stringutils v0.2.2 h1:uoY47kQYaC5BAFy+HkcyqrkOvg+MFp/yPzPvtZXJONs=
 github.com/akyoto/stringutils v0.2.2/go.mod h1:ZqFe1SE9y6vsFSG0YWGSm+y6qR2zvkUeCVsxy8pXTf0=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=
