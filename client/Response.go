@@ -2,10 +2,9 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 // Response represents the HTTP response used in the given client.
@@ -147,5 +146,5 @@ func (response Response) RawLength() int {
 
 // Unmarshal tries to JSON decode the response and save it in the object.
 func (response Response) Unmarshal(obj interface{}) error {
-	return jsoniter.Unmarshal(response.Bytes(), obj)
+	return json.Unmarshal(response.Bytes(), obj)
 }

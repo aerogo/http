@@ -1,12 +1,11 @@
 package client
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
 	"net/url"
-
-	jsoniter "github.com/json-iterator/go"
 )
 
 // Client represents a single
@@ -74,7 +73,7 @@ func (http *Client) BodyString(raw string) *Client {
 
 // BodyJSON sets the request body by converting the object to JSON.
 func (http *Client) BodyJSON(obj interface{}) *Client {
-	data, err := jsoniter.Marshal(obj)
+	data, err := json.Marshal(obj)
 
 	if err != nil {
 		log.Printf("Error converting request body to JSON: %v", err)

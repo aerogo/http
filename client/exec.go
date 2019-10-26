@@ -114,7 +114,7 @@ func (http *Client) exec(ip net.IP) error {
 			if http.response.statusCode == 0 {
 				statusPos := bytes.IndexByte(tmp, ' ')
 				statusSlice := tmp[statusPos+1 : statusPos+4]
-				http.response.statusCode = convert.DecToInt(statusSlice)
+				http.response.statusCode = int(convert.DecToInt(statusSlice))
 			}
 
 			doubleNewlinePos := bytes.Index(tmp, doubleNewlineSequence)
@@ -159,7 +159,7 @@ func (http *Client) exec(ip net.IP) error {
 					isChunked = true
 				} else {
 					lengthSlice := http.response.Header(contentLengthHeader)
-					contentLength = convert.DecToInt(lengthSlice)
+					contentLength = int(convert.DecToInt(lengthSlice))
 					response.Grow(contentLength)
 				}
 			}
