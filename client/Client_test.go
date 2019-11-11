@@ -49,21 +49,23 @@ func testResponse(t *testing.T, response *client.Response, err error) {
 
 func TestClient(t *testing.T) {
 	for _, url := range urls {
-		println("URL", url)
-		response, err := client.Get(url).End()
-		testResponse(t, response, err)
-		_, err = response.WriteTo(ioutil.Discard)
-		assert.Nil(t, err)
+		t.Run(url, func(t *testing.T) {
+			response, err := client.Get(url).End()
+			testResponse(t, response, err)
+			_, err = response.WriteTo(ioutil.Discard)
+			assert.Nil(t, err)
+		})
 	}
 }
 
 func TestClientNoGZip(t *testing.T) {
 	for _, url := range urls {
-		println("URL", url)
-		response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
-		testResponse(t, response, err)
-		_, err = response.WriteTo(ioutil.Discard)
-		assert.Nil(t, err)
+		t.Run(url, func(t *testing.T) {
+			response, err := client.Get(url).Header("Accept-Encoding", "identity").End()
+			testResponse(t, response, err)
+			_, err = response.WriteTo(ioutil.Discard)
+			assert.Nil(t, err)
+		})
 	}
 }
 
