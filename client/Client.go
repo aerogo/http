@@ -113,6 +113,7 @@ func (http *Client) Do() error {
 	}
 
 	connections := make(chan net.Conn, len(ips))
+	errors := make(chan error, len(ips))
 
 	for _, ip := range ips {
 		go func(ip net.IP) {
@@ -124,6 +125,7 @@ func (http *Client) Do() error {
 			connection, err := net.DialTCP("tcp", nil, &remoteAddress)
 
 			if err != nil {
+				errors <- err
 				return
 			}
 
@@ -131,8 +133,21 @@ func (http *Client) Do() error {
 		}(ip)
 	}
 
-	connection := <-connections
-	return http.exec(connection)
+	errorCount := 0
+
+	for {
+		select {
+		case connection := <-connections:
+			return http.exec(connection)
+
+		case err := <-errors:
+			errorCount++
+
+			if errorCount == len(ips) {
+				return err
+			}
+		}
+	}
 }
 
 // End executes the request and returns the response.
