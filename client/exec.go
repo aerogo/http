@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net"
-	"strconv"
 	"unicode"
 
 	"github.com/aerogo/http/ciphers"
@@ -14,33 +13,9 @@ import (
 
 var clientSessionCache = tls.NewLRUClientSessionCache(0)
 
-// exec executes the request and returns the respense for the given IP.
-func (http *Client) exec(ip net.IP) error {
-	var connection net.Conn
-	var err error
-
-	port, _ := strconv.Atoi(http.request.url.Port())
-
-	if port == 0 {
-		if http.request.url.Scheme == "https" {
-			port = 443
-		} else {
-			port = 80
-		}
-	}
-
-	remoteAddress := net.TCPAddr{
-		IP:   ip,
-		Port: port,
-	}
-
-	connection, err = net.DialTCP("tcp", nil, &remoteAddress)
-
-	if err != nil {
-		return err
-	}
-
-	err = connection.(*net.TCPConn).SetNoDelay(true)
+// exec executes the request and returns the response.
+func (http *Client) exec(connection net.Conn) error {
+	err := connection.(*net.TCPConn).SetNoDelay(true)
 
 	if err != nil {
 		return err
