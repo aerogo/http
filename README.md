@@ -22,10 +22,12 @@ go get github.com/aerogo/http/client
 response, err := client.Get("https://example.com").End()
 ```
 
-### Basic POST request
+### Other HTTP methods
 
 ```go
-response, err := client.Post("https://example.com").End()
+client.Post("https://example.com/user/1").End()
+client.Put("https://example.com/user/1").End()
+client.Delete("https://example.com/user/1").End()
 ```
 
 ### Sending request headers
@@ -84,7 +86,7 @@ Please take a look at the [style guidelines](https://github.com/akyoto/quality/b
 
 ## Sponsors
 
-| [![Cedric Fung](https://avatars3.githubusercontent.com/u/2269238?s=70&v=4)](https://github.com/cedricfung) | [![Scott Rayapoullé](https://avatars3.githubusercontent.com/u/11772084?s=70&v=4)](https://github.com/soulcramer) | [![Eduard Urbach](https://avatars3.githubusercontent.com/u/438936?s=70&v=4)](https://twitter.com/eduardurbach) |
+| [![Cedric Fung](https://avatars3.githubusercontent.com/u/2269238?s=70&v=4)](https://github.com/cedricfung) | [![Scott Rayapoullé](https://avatars3.githubusercontent.com/u/11772084?s=70&v=4)](https://github.com/soulcramer) | [![Eduard Urbach](https://avatars3.githubusercontent.com/u/438936?s=70&v=4)](https://eduardurbach.com) |
 | --- | --- | --- |
 | [Cedric Fung](https://github.com/cedricfung) | [Scott Rayapoullé](https://github.com/soulcramer) | [Eduard Urbach](https://eduardurbach.com) |
 

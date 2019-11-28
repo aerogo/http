@@ -18,10 +18,12 @@ go get github.com/aerogo/http/client
 response, err := client.Get("https://example.com").End()
 ```
 
-### Basic POST request
+### Other HTTP methods
 
 ```go
-response, err := client.Post("https://example.com").End()
+client.Post("https://example.com/user/1").End()
+client.Put("https://example.com/user/1").End()
+client.Delete("https://example.com/user/1").End()
 ```
 
 ### Sending request headers

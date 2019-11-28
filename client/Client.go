@@ -17,6 +17,26 @@ type Client struct {
 
 // Get builds a GET request.
 func Get(path string) *Client {
+	return WithMethod(path, "GET")
+}
+
+// Post builds a POST request.
+func Post(path string) *Client {
+	return WithMethod(path, "POST")
+}
+
+// Put builds a PUT request.
+func Put(path string) *Client {
+	return WithMethod(path, "PUT")
+}
+
+// Delete builds a DELETE request.
+func Delete(path string) *Client {
+	return WithMethod(path, "DELETE")
+}
+
+// WithMethod builds a request with a custom HTTP verb.
+func WithMethod(path string, method string) *Client {
 	parsedURL, err := url.Parse(path)
 
 	if err != nil {
@@ -25,7 +45,7 @@ func Get(path string) *Client {
 
 	http := &Client{
 		request: request{
-			method: "GET",
+			method: method,
 			url:    parsedURL,
 			headers: Headers{
 				"Host":            parsedURL.Hostname(),
@@ -36,13 +56,6 @@ func Get(path string) *Client {
 	}
 
 	return http
-}
-
-// Post builds a POST request.
-func Post(path string) *Client {
-	client := Get(path)
-	client.request.method = "POST"
-	return client
 }
 
 // Header sets one HTTP header for the request.
