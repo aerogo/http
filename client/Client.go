@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 // Client represents a single
@@ -37,6 +38,7 @@ func Delete(path string) *Client {
 
 // WithMethod builds a request with a custom HTTP verb.
 func WithMethod(path string, method string) *Client {
+	path = strings.ReplaceAll(path, " ", "%20")
 	parsedURL, err := url.Parse(path)
 
 	if err != nil {
