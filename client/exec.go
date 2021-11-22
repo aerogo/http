@@ -68,34 +68,33 @@ func (http *Client) exec(connection net.Conn) error {
 	}
 
 	// Receive response
-	var response bytes.Buffer
-	tmp := make([]byte, 16384)
-	contentLength := -1
-	isChunked := false
-	headerEndPosition := -1
-	bodyStartPosition := 0
-	lastChunkPosition := -1
-
-	// Create another buffer just for chunked responses
-	var decodedChunks bytes.Buffer
+	var (
+		response          bytes.Buffer
+		decodedChunks     bytes.Buffer
+		tmp               = make([]byte, 16384)
+		headerEndPosition = -1
+		bodyStartPosition = -1
+		lastChunkPosition = -1
+		contentLength     = -1
+		isChunked         = false
+	)
 
 	for {
 		n, err := connection.Read(tmp)
 		response.Write(tmp[:n])
 
-		// Find headers
+		// Find status
+		if http.response.statusCode == 0 {
+			statusPos := bytes.IndexByte(tmp, ' ')
+			statusSlice := tmp[statusPos+1 : statusPos+4]
+			http.response.statusCode = int(convert.DecToInt(statusSlice))
+		}
+
+		// Find end of headers
 		if headerEndPosition == -1 {
-			// Find status
-			if http.response.statusCode == 0 {
-				statusPos := bytes.IndexByte(tmp, ' ')
-				statusSlice := tmp[statusPos+1 : statusPos+4]
-				http.response.statusCode = int(convert.DecToInt(statusSlice))
-			}
+			headerEndPosition = bytes.Index(response.Bytes(), doubleNewlineSequence)
 
-			doubleNewlinePos := bytes.Index(tmp, doubleNewlineSequence)
-
-			if doubleNewlinePos != -1 {
-				headerEndPosition = response.Len() - n + doubleNewlinePos
+			if headerEndPosition != -1 {
 				bodyStartPosition = headerEndPosition + len(doubleNewlineSequence)
 				lastChunkPosition = bodyStartPosition
 				http.response.header = response.Bytes()[:headerEndPosition]
@@ -140,30 +139,24 @@ func (http *Client) exec(connection net.Conn) error {
 			}
 		}
 
-		// Read chunks
 		if isChunked {
 			chunkBytes := response.Bytes()[lastChunkPosition:]
 			chunkBytesRead, finished := decodeChunks(chunkBytes, &decodedChunks)
 
-			// If we read the last chunk, we're finished here
 			if finished {
 				http.response.body = decodedChunks.Bytes()
 				return nil
 			}
 
 			lastChunkPosition += chunkBytesRead
+		} else if headerEndPosition != -1 && response.Len()-bodyStartPosition >= contentLength {
+			http.response.body = response.Bytes()[bodyStartPosition:]
+			return nil
 		}
 
-		// End response on error
 		if err != nil {
 			http.response.body = response.Bytes()[bodyStartPosition:]
 			return err
-		}
-
-		// End response if content length has been reached
-		if !isChunked && contentLength != -1 && response.Len()-bodyStartPosition >= contentLength {
-			http.response.body = response.Bytes()[bodyStartPosition:]
-			return nil
 		}
 	}
 }
