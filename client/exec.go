@@ -70,7 +70,7 @@ func (http *Client) exec(connection net.Conn) error {
 	// Receive response
 	var response bytes.Buffer
 	tmp := make([]byte, 16384)
-	contentLength := 0
+	contentLength := -1
 	isChunked := false
 	headerEndPosition := -1
 	bodyStartPosition := 0
@@ -161,7 +161,7 @@ func (http *Client) exec(connection net.Conn) error {
 		}
 
 		// End response if content length has been reached
-		if !isChunked && response.Len()-bodyStartPosition >= contentLength {
+		if !isChunked && contentLength != -1 && response.Len()-bodyStartPosition >= contentLength {
 			http.response.body = response.Bytes()[bodyStartPosition:]
 			return nil
 		}

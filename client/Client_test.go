@@ -69,6 +69,33 @@ func TestClientNoGZip(t *testing.T) {
 	}
 }
 
+func TestClientPost(t *testing.T) {
+	type Variables struct {
+		Name string `json:"name"`
+	}
+
+	body := struct {
+		Query     string    `json:"query"`
+		Variables Variables `json:"variables"`
+	}{
+		Query: `
+			query ($name: String) {
+				User (name: $name) {
+					id
+					name
+				}
+			}
+		`,
+		Variables: Variables{
+			Name: "Akyoto",
+		},
+	}
+
+	response, err := client.Post("https://graphql.anilist.co").Header("Content-Type", "application/json").Header("Accept", "application/json").BodyJSON(body).End()
+	t.Log(response.String())
+	assert.Nil(t, err)
+}
+
 func BenchmarkClient(b *testing.B) {
 	b.ReportAllocs()
 
